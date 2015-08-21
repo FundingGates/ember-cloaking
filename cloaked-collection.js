@@ -1,3 +1,5 @@
+import $ from 'jquery';
+import Ember from 'ember';
 import CloakedView from './cloaked';
 
 const CloakedCollectionView = Ember.CollectionView.extend({
@@ -169,7 +171,7 @@ const CloakedCollectionView = Ember.CollectionView.extend({
     if (onscreen.length) {
       this.setProperties({topVisible: onscreen[0], bottomVisible: onscreen[onscreen.length-1]});
       if (controller && controller.sawObjects) {
-        Em.run.schedule('afterRender', function() {
+        Ember.run.schedule('afterRender', function() {
           controller.sawObjects(onscreen);
         });
       }
@@ -181,26 +183,26 @@ const CloakedCollectionView = Ember.CollectionView.extend({
 
     this._uncloak = toUncloak;
     if(this._nextUncloak){
-      Em.run.cancel(this._nextUncloak);
+      Ember.run.cancel(this._nextUncloak);
       this._nextUncloak = null;
     }
 
-    Em.run.schedule('afterRender', this, function() {
+    Ember.run.schedule('afterRender', this, function() {
       onscreenCloaks.forEach(function (v) {
         if(v && v.uncloak) {
           v.uncloak();
         }
       });
       toCloak.forEach(function (v) { v.cloak(); });
-      if (self._nextUncloak) { Em.run.cancel(self._nextUncloak); }
-      self._nextUncloak = Em.run.later(self, self.uncloakQueue,50);
+      if (self._nextUncloak) { Ember.run.cancel(self._nextUncloak); }
+      self._nextUncloak = Ember.run.later(self, self.uncloakQueue,50);
     });
 
     for (let j=bottomView; j<childViews.length; j++) {
       const checkView = childViews[j];
       if (!checkView._containedView) {
         const loadingHTML = this.get('loadingHTML');
-        if (!Em.isEmpty(loadingHTML) && !checkView.get('loading')) {
+        if (!Ember.isEmpty(loadingHTML) && !checkView.get('loading')) {
           checkView.$().html(loadingHTML);
         }
         return;
@@ -216,22 +218,22 @@ const CloakedCollectionView = Ember.CollectionView.extend({
       while(processed < maxPerRun && this._uncloak.length>0){
         const view = this._uncloak.shift();
         if(view && view.uncloak && !view._containedView){
-          Em.run.schedule('afterRender', view, view.uncloak);
+          Ember.run.schedule('afterRender', view, view.uncloak);
           processed++;
         }
       }
       if(this._uncloak.length === 0){
         this._uncloak = null;
       } else {
-        Em.run.schedule('afterRender', self, function(){
+        Ember.run.schedule('afterRender', self, function(){
           if(self._nextUncloak){
-            Em.run.cancel(self._nextUncloak);
+            Ember.run.cancel(self._nextUncloak);
           }
-          self._nextUncloak = Em.run.next(self, function(){
+          self._nextUncloak = Ember.run.next(self, function(){
             if(self._nextUncloak){
-              Em.run.cancel(self._nextUncloak);
+              Ember.run.cancel(self._nextUncloak);
             }
-            self._nextUncloak = Em.run.later(self,self.uncloakQueue,delay);
+            self._nextUncloak = Ember.run.later(self,self.uncloakQueue,delay);
           });
         });
       }
@@ -239,7 +241,7 @@ const CloakedCollectionView = Ember.CollectionView.extend({
   },
 
   scrollTriggered() {
-    Em.run.scheduleOnce('afterRender', this, 'scrolled');
+    Ember.run.scheduleOnce('afterRender', this, 'scrolled');
   },
 
   _startEvents: function() {
@@ -247,7 +249,7 @@ const CloakedCollectionView = Ember.CollectionView.extend({
       return;
     }
     if (this.get('offsetFixed')) {
-      Em.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
+      Ember.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
     }
 
     const self = this,

@@ -1,3 +1,5 @@
+import Ember from 'ember';
+
 export default Ember.View.extend({
   attributeBindings: ['style'],
   _containedView: null,
@@ -23,7 +25,9 @@ export default Ember.View.extend({
       this._childViews.clear();
     }
 
-    if (this._scheduled) return;
+    if (this._scheduled) {
+      return;
+    }
     this._scheduled = true;
     this.set('_containedView', cv);
     Ember.run.schedule('render', this, this.updateChildView);
