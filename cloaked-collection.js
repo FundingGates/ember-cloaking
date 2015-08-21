@@ -1,4 +1,4 @@
-import CloakedView from 'discourse/views/cloaked';
+import CloakedView from './cloaked';
 
 const CloakedCollectionView = Ember.CollectionView.extend({
   cloakView: Ember.computed.alias('itemViewClass'),
@@ -31,7 +31,7 @@ const CloakedCollectionView = Ember.CollectionView.extend({
         if (idProperty) {
           this.set('elementId', cloakView + '-cloak-' + this.get('content.' + idProperty));
         }
-        if (uncloakDefault) {
+        if (uncloakDefault || Ember.testing) {
           this.uncloak();
         } else {
           this.cloak();
@@ -40,7 +40,9 @@ const CloakedCollectionView = Ember.CollectionView.extend({
     }));
 
     this._super();
-    Ember.run.next(this, 'scrolled');
+    if (!Ember.testing) {
+      Ember.run.next(this, 'scrolled');
+    }
   },
 
   /**
@@ -241,6 +243,9 @@ const CloakedCollectionView = Ember.CollectionView.extend({
   },
 
   _startEvents: function() {
+    if (Ember.testing) {
+      return;
+    }
     if (this.get('offsetFixed')) {
       Em.warn("Cloaked-collection's `offsetFixed` is deprecated. Use `offsetFixedTop` instead.");
     }
